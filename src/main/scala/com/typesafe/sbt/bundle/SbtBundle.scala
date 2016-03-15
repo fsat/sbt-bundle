@@ -44,7 +44,7 @@ object Import {
       val GET, POST, PUT, DELETE, HEAD, TRACE, CONNECT = Value
     }
 
-    implicit def method(m: String): Method.Value =
+    def method(m: String): Method.Value =
       Method.withName(m)
 
     case class Request(method: Option[Method.Value], path: Either[String, Regex], rewrite: Option[String])
@@ -55,16 +55,16 @@ object Import {
       Request(None, Right(r), None)
 
     implicit def request2(r: (String, String)): Request =
-      Request(Some(r._1), Left(r._2), None)
+      Request(Some(method(r._1)), Left(r._2), None)
     implicit def regexRequest2(r: (String, Regex)): Request =
-      Request(Some(r._1), Right(r._2), None)
+      Request(Some(method(r._1)), Right(r._2), None)
     implicit def regexToStringRequest2(r: (Regex, String)): Request =
       Request(None, Right(r._1), Some(r._2))
 
     implicit def request3(r: ((String, String), String)): Request =
-      Request(Some(r._1._1), Left(r._1._2), Some(r._2))
+      Request(Some(method(r._1._1)), Left(r._1._2), Some(r._2))
     implicit def regexRequest3(r: ((String, Regex), String)): Request =
-      Request(Some(r._1._1), Right(r._1._2), Some(r._2))
+      Request(Some(method(r._1._1)), Right(r._1._2), Some(r._2))
   }
 
   /**

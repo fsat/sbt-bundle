@@ -22,6 +22,7 @@ BundleKeys.endpoints += "extras" -> Endpoint("http", 0, "ping-service",
       "/bar-1",
       "GET" -> "/bar-2",
       "GET" -> "/bar-3" -> "/other-bar-3",
+      "/bar-4" -> "/other-bar-4",
       "^/beg-1".r,
       "GET" -> "^/beg-2".r,
       "GET" -> "^/beg-3".r -> "/other-beg-3",
@@ -88,6 +89,10 @@ checkBundleConf := {
                             |                  path = "/bar-3"
                             |                  method = "GET"
                             |                  rewrite = "/other-bar-3"
+                            |                },
+                            |                {
+                            |                  path = "/bar-4"
+                            |                  rewrite = "/other-bar-4"
                             |                },
                             |                {
                             |                  path-beg = "/beg-1"

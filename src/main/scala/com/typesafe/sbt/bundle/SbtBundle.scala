@@ -11,6 +11,7 @@ import SbtNativePackager.Universal
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._
+import scala.util.Try
 import scala.util.matching.Regex
 
 object Import {
@@ -55,7 +56,17 @@ object Import {
       Request(None, Right(r), None)
 
     implicit def request2(r: (String, String)): Request =
-      Request(Some(method(r._1)), Left(r._2), None)
+      Try(method(r._1))
+        .map(httpMethod => Request(Some(httpMethod), Left(r._2), None))
+        .getOrElse {
+          r._1 match {
+            case path if path.startsWith("/") =>
+              Request(None, Left(path), Some(r._2))
+            case invalidPath =>
+              throw new IllegalArgumentException(s"The value $invalidPath is not a valid path")
+          }
+        }
+
     implicit def regexRequest2(r: (String, Regex)): Request =
       Request(Some(method(r._1)), Right(r._2), None)
     implicit def regexToStringRequest2(r: (Regex, String)): Request =
@@ -464,6 +475,7 @@ object SbtBundle extends AutoPlugin {
 
   /**
     * Creates a bundle configuration in the specified config target directory
+    *
     * @param config under which the bundle configuration is created
     * @param message that is printed if the bundle configuration has been successfully created.
     * @return the created bundle configuration file
